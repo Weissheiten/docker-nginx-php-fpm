@@ -1,40 +1,43 @@
-FROM ubuntu:16.04
+FROM quay.io/yeebase/debian-base:stretch
 
-RUN echo "deb http://ppa.launchpad.net/ondrej/php/ubuntu xenial main" > /etc/apt/sources.list.d/ondrej.list \
-  && echo "deb http://nginx.org/packages/ubuntu/ xenial nginx" > /etc/apt/sources.list.d/nginx.list \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4F4EA0AAE5267A6C \
-  && apt-key adv --keyserver keyserver.ubuntu.com --recv-keys ABF5BD827BD9BF62 \
-  && apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y \
-        php7.1-cli php7.1-common php7.1-curl php7.1-fpm php7.1-gd php7.1-json php7.1-mbstring \
-        php7.1-mcrypt php7.1-mysql php7.1-opcache php7.1-readline php7.1-soap php7.1-tidy php7.1-xml \
-        php7.1-xmlrpc php7.1-bcmath php-memcached php-mongodb php-redis nginx supervisor curl \
-        ca-certificates \
-  && echo 'deb http://s3-eu-west-1.amazonaws.com/qafoo-profiler/packages debian main' > /etc/apt/sources.list.d/tideways.list \
-  && curl -sS -k 'https://s3-eu-west-1.amazonaws.com/qafoo-profiler/packages/EEB5E8F4.gpg' | apt-key add - \
-  && apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get -yq install tideways-php \
-  && apt-get -y remove curl \
-  && apt-get -y dist-upgrade \
-  && apt-get -y autoremove \
-  && apt-get clean \
-  && apt-get autoclean && \
-        rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /etc/nginx/conf.d/default.conf
+ENV PHP_VERSION 7.2
 
-RUN userdel www-data \
-  && useradd www-data -u 1001 -U -d /var/www -s /usr/sbin/nologin
+RUN set -x && \
+    clean-install apt-transport-https lsb-release ca-certificates curl gnupg && \
+    curl -sL https://packages.sury.org/php/apt.gpg -o /etc/apt/trusted.gpg.d/php.gpg && \
+    echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list && \
+    curl -sL https://nginx.org/keys/nginx_signing.key | apt-key add - && \
+    echo "deb https://nginx.org/packages/mainline/debian/ $(lsb_release -sc) nginx" > /etc/apt/sources.list.d/nginx.list && \
+    clean-install \
+      php${PHP_VERSION}-common \
+      php${PHP_VERSION}-cli \
+      php${PHP_VERSION}-fpm \
+      php${PHP_VERSION}-curl \
+      php${PHP_VERSION}-gd \
+      php${PHP_VERSION}-json \
+      php${PHP_VERSION}-mbstring \
+      php${PHP_VERSION}-mcrypt \
+      php${PHP_VERSION}-mysql \
+      php${PHP_VERSION}-opcache \
+      php${PHP_VERSION}-readline \
+      php${PHP_VERSION}-soap \
+      php${PHP_VERSION}-tidy \
+      php${PHP_VERSION}-xml \
+      php${PHP_VERSION}-xmlrpc \
+      php${PHP_VERSION}-bcmath \
+      php${PHP_VERSION}-zip \
+      php-mongodb \
+      php-redis \
+      nginx && \
+    clean-uninstall curl && \
+    mkdir -p /run/php /var/www /var/log/nginx/ && \
+    ln -sf /usr/sbin/php-fpm${PHP_VERSION} /usr/sbin/php-fpm && \
+    rm /etc/nginx/conf.d/default.conf
 
-RUN mkdir -p /var/www \
-  && mkdir -p /run/php \
-  && mkdir -p /tmp/nginx \
-  && mkdir -p /tmp/php \
-  && echo "<?php phpinfo(); ?>" > /var/www/index.php \
-  && chown -R www-data:www-data /var/www \
-  && chown -R www-data:www-data /tmp/php
-
-COPY conf/supervisord.conf /etc/supervisor/supervisord.conf
 COPY conf/nginx /etc/nginx
-COPY conf/php /etc/php/7.1
+COPY conf/php /etc/php/${PHP_VERSION}
+COPY bin/ /usr/local/bin/
 
 EXPOSE 80
-CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+
+CMD ["nginx-php-fpm"]

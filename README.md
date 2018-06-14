@@ -1,3 +1,5 @@
-# Base docker image that provides nginx and php-fpm
+# docker-nginx-php-fpm
 
-This image is not meant to be used directly. Extend from this image and add your vhost.conf in /etc/nginx/hosts.d/your.conf
+[![Docker Repository on Quay](https://quay.io/repository/yeebase/nginx-php-fpm/status "Docker Repository on Quay")](https://quay.io/repository/yeebase/nginx-php-fpm)
+
+Base docker image running nginx + php-fpm.
