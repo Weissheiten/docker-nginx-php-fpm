@@ -1,6 +1,6 @@
 FROM quay.io/yeebase/debian-base:stretch
 
-ENV PHP_VERSION 7.2
+ENV PHP_VERSION 7.1
 
 RUN set -x && \
     clean-install apt-transport-https lsb-release ca-certificates curl gnupg && \
@@ -16,7 +16,7 @@ RUN set -x && \
       php${PHP_VERSION}-gd \
       php${PHP_VERSION}-json \
       php${PHP_VERSION}-mbstring \
-      # php${PHP_VERSION}-mcrypt \ not available for php7.2
+      php${PHP_VERSION}-mcrypt \
       php${PHP_VERSION}-mysql \
       php${PHP_VERSION}-opcache \
       php${PHP_VERSION}-readline \
