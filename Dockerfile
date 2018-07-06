@@ -8,6 +8,8 @@ RUN set -x && \
     echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list && \
     curl -sL https://nginx.org/keys/nginx_signing.key | apt-key add - && \
     echo "deb https://nginx.org/packages/mainline/debian/ $(lsb_release -sc) nginx" > /etc/apt/sources.list.d/nginx.list && \
+    curl -sL https://s3-eu-west-1.amazonaws.com/qafoo-profiler/packages/EEB5E8F4.gpg | apt-key add - && \
+    echo "deb http://s3-eu-west-1.amazonaws.com/qafoo-profiler/packages debian main" > /etc/apt/sources.list.d/tideways.list && \
     clean-install \
       php${PHP_VERSION}-common \
       php${PHP_VERSION}-cli \
@@ -28,6 +30,8 @@ RUN set -x && \
       php${PHP_VERSION}-zip \
       php-mongodb \
       php-redis \
+      tideways-php \
+      tideways-cli \
       nginx && \
     clean-uninstall curl && \
     mkdir -p /run/php /var/www /var/log/nginx/ && \
