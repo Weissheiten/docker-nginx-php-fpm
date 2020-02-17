@@ -22,6 +22,5 @@ server {
     }
 
     # Import configuration files for status pages for Nginx and PHP-FPM
-    include /etc/nginx/addon.d/stub-status.conf;
-    include /etc/nginx/addon.d/fpm-status.conf;
+    include /etc/nginx/addon.d/*.conf;
 }
