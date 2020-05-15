@@ -1,6 +1,6 @@
 FROM quay.io/yeebase/debian-base:stretch
 
-ENV PHP_VERSION 7.3
+ENV PHP_VERSION 7.4
 ENV NGINX_VTS_VERSION 0.1.18
 
 RUN set -x && \
